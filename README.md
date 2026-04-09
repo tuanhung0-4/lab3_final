@@ -1,68 +1,40 @@
-# COURSE MANAGEMENT SYSTEM (CMS) - HƯỚNG DẪN CÀI ĐẶT & CHẠY DỰ ÁN
+# Coffee Shop Management System (Laravel)
 
-## 1. Yêu cầu hệ thống
-- Môi trường: XAMPP (Windows).
-- PHP >= 8.1
-- MySQL (MariaDB).
+Dự án quản lý quán Cafe chuyên nghiệp được xây dựng trên nền tảng Laravel, tuân thủ các quy chuẩn kỹ thuật hiện đại.
 
----
+## 🚀 Tính năng chính
+- **Dashboard**: Thống kê doanh thu, món bán chạy, số lượng đơn hàng.
+- **Quản lý thực đơn**: CRUD sản phẩm, phân loại danh mục, lọc theo giá/tên.
+- **Thùng rác (Soft Delete)**: Khôi phục hoặc xóa vĩnh viễn món ăn.
+- **Quản lý bàn**: Trạng thái bàn trống/có khách.
+- **Xử lý đơn hàng**: Tạo đơn, tính tiền tự động và hoàn tất thanh toán.
 
-## 2. Các bước cài đặt dự án
+## 🛠 Kỹ thuật áp dụng
+- **Eloquent Relationships**: belongsTo, hasMany.
+- **Advanced Query**: Eager Loading (`with`), Query Scopes (`available`, `priceRange`).
+- **Validation**: Form Request chuyên biệt.
+- **Blade Component**: Alert, Badge, Product Card tái sử dụng.
+- **UI/UX**: Thiết kế Premium với Google Fonts (Outfit) và CSS hiện đại.
 
-### Bước 1: Chuẩn bị file `.env`
-- Tạo file `.env` (copy từ `.env.example`).
-- Cấu hình database trong file `.env` (XAMPP mặc định):
-    ```env
-    DB_CONNECTION=mysql
-    DB_HOST=127.0.0.1
-    DB_PORT=3306
-    DB_DATABASE=course_management
-    DB_USERNAME=root
-    DB_PASSWORD=
-    ```
+## 📦 Cài đặt
+1. Clone dự án.
+2. Sao chép `.env.coffee` thành `.env`.
+3. Tạo cơ sở dữ liệu `coffee_shop_db` trong MySQL.
+4. Chạy lệnh cài đặt:
+   ```bash
+   composer install
+   php artisan key:generate
+   php artisan migrate --seed --seeder=CoffeeShopSeeder
+   php artisan storage:link
+   ```
+5. Khởi chạy:
+   ```bash
+   php artisan serve
+   ```
 
-### Bước 2: Chuẩn bị Database
-- Mở **phpMyAdmin** tại địa chỉ `http://localhost/phpmyadmin/`.
-- Tạo một database mới tên là `course_management`.
-
-### Bước 3: Chạy các lệnh cài đặt trên Terminal (Powershell)
-Mở terminal tại thư mục dự án và chạy các lệnh sau:
-
-```bash
-# 1. Cài đặt các thư viện (Vendor)
-composer install
-
-# 2. Tạo khóa ứng dụng
-php artisan key:generate
-
-# 3. Tạo các bảng và nạp dữ liệu mẫu (Sample Data)
-php artisan migrate:fresh --seed
-
-# 4. Tạo đường dẫn liên kết cho ảnh (Storage)
-php artisan storage:link
-```
-
----
-
-## 3. Chạy ứng dụng
-- Chạy lệnh sau để khởi động server:
-    ```bash
-    php artisan serve
-    ```
-- Truy cập vào địa chỉ: [http://localhost:8000](http://localhost:8000)
-
----
-
-## 4. Các tài liệu đi kèm
-Bạn có thể tham khảo thêm các tài liệu hướng dẫn chi tiết khác trong cùng thư mục:
-- **[PROJECT_DOCS.md](PROJECT_DOCS.md)**: Mô tả bài toán, Sơ đồ ERD và Phác thảo giao diện.
-- **[TECHNICAL_EXPLANATION.md](TECHNICAL_EXPLANATION.md)**: Giải thích chi tiết mã nguồn (Relationship, Validation, Optimization).
-
----
-
-## 5. Tài khoản & Dữ liệu mẫu (Sample Data)
-Sau khi chạy lệnh `db:seed`, hệ thống sẽ có sẵn:
-- 5 Khóa học tiêu biểu với các trạng thái khác nhau.
-- 25 Bài học tương ứng.
-- 5 Học viên đăng ký vào các khóa học này.
-- Thống kê doanh thu và báo cáo sẵn sàng trên Dashboard.
+## 📂 Cấu trúc logic chuyển đổi
+- `Category` (Danh mục) <- Thay thế Course Category.
+- `Product` (Sản phẩm) <- Thay thế Course.
+- `Table` (Bàn) <- Thực thể quản lý vị trí.
+- `Order` (Đơn hàng) <- Thay thế Enrollment.
+- `OrderItem` (Chi tiết) <- Thay thế Lesson (Chi tiết từng món).

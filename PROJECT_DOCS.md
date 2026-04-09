@@ -1,81 +1,48 @@
-# TÀI LIỆU MÔ TẢ DỰ ÁN - COURSE MANAGEMENT SYSTEM (CMS)
+# TÀI LIỆU TỔNG HỢP DỰ ÁN QUẢN LÝ QUÁN CAFE
 
-## 1. Mô tả chức năng bài toán
-Dự án là một hệ thống quản lý khóa học trực tuyến (LMS Mini), cho phép người quản trị:
-- **Quản lý khóa học**: Tạo mới (có upload ảnh, tự sinh slug), cập nhật, xóa tạm thời (Soft Delete) và khôi phục khóa học.
-- **Quản lý bài học**: Mỗi khóa học chứa nhiều bài học được sắp xếp theo thứ tự (order). Hỗ trợ xem danh sách bài học theo từng khóa.
-- **Quản lý đăng ký (Enrollment)**: Ghi danh học viên (Tên, Email) vào các khóa học cụ thể.
-- **Dashboard Thống kê**: Theo dõi tổng số khóa học, tổng học viên, tổng doanh thu (giả lập), khóa học "hot" nhất và các khóa học mới cập nhật.
-- **Tìm kiếm & Lọc**: Hệ thống hỗ trợ tìm kiếm theo tên, lọc theo trạng thái (Draft/Published), lọc giá và sắp xếp theo nhiều tiêu chuẩn (Giá, Số học viên, Số bài học...).
+## 1. PHÂN TÍCH QUAN HỆ DỮ LIỆU (ENTITY RELATIONSHIP)
+| Bảng | Quan hệ | Mô tả |
+| :--- | :--- | :--- |
+| **Category** | HasMany `Product` | Phân loại món (Cà phê, Trà, Bánh...) |
+| **Product** | BelongsTo `Category` | Thông tin món ăn, giá, ảnh |
+| **Table** | HasMany `Order` | Quản lý trạng thái bàn (Trống/Bận) |
+| **Order** | BelongsTo `Table`, HasMany `OrderItem` | Thông tin hóa đơn tổng thể |
+| **OrderItem** | BelongsTo `Product` | Chi tiết từng món trong hóa đơn |
 
----
+## 2. CẤU TRÚC KỸ THUẬT CHI TIẾT
 
-## 2. Sơ đồ ERD (Entity Relationship Diagram)
+### 2.1. Model & Eloquent (app/Models)
+- **Soft Deletes**: Áp dụng trong `Product.php` để tránh mất dữ liệu khi xóa nhầm.
+- **Query Scopes**:
+    - `scopeAvailable()`: Lọc món đang kinh doanh.
+    - `scopePriceRange($min, $max)`: Lọc theo khoảng giá.
+- **Relationships**:
+    - Sử dụng `withCount('products')` trong `CategoryController` để đếm số lượng món nhanh chóng.
+    - Sử dụng `belongsToMany` trong `Order.php` thông qua `order_items` để truy xuất danh sách món đã gọi.
 
-```mermaid
-erDiagram
-    COURSES ||--o{ LESSONS : "1-N (Has many lessons)"
-    COURSES ||--o{ ENROLLMENTS : "1-N (Has many enrollments)"
-    STUDENTS ||--o{ ENROLLMENTS : "1-N (Has many enrollments)"
-    
-    COURSES {
-        bigint id PK
-        string name
-        string slug "Unique"
-        decimal price
-        text description
-        string image
-        enum status "draft / published"
-        timestamp deleted_at "Soft Delete"
-        timestamp created_at
-        timestamp updated_at
-    }
+### 2.2. Xử lý logic (app/Http/Controllers)
+- **Eager Loading**: Luôn sử dụng `with(['category'])` trong `ProductController` để tối ưu hóa 1 truy vấn thay vì N+1.
+- **Transaction**: Sử dụng `DB::beginTransaction()` trong `OrderController@store` để đảm bảo khi tạo đơn hàng, nếu lỗi ở bất kỳ bước nào (trừ tiền, cập nhật bàn) thì toàn bộ dữ liệu sẽ được hoàn tác.
 
-    LESSONS {
-        bigint id PK
-        bigint course_id FK
-        string title
-        text content
-        string video_url
-        integer order
-        timestamp created_at
-        timestamp updated_at
-    }
+### 2.3. Validation (app/Http/Requests)
+- **ProductRequest**: Kiểm tra tên không trống, giá phải là số dương, ảnh đúng định dạng file.
+- **OrderRequest**: Ràng buộc phải chọn bàn và có ít nhất 1 sản phẩm với số lượng > 0.
 
-    STUDENTS {
-        bigint id PK
-        string name
-        string email "Unique"
-        timestamp created_at
-        timestamp updated_at
-    }
+### 2.4. Giao diện & Component (resources/views)
+- **Master Layout**: Tách biệt Sidebar (navigation) và Header (user info).
+- **Reusable Blade Components**:
+    - `<x-alert>`: Hiển thị thông báo Toast/Alert.
+    - `<x-badge>`: Hiển thị trạng thái màu sắc (Thành công, Cảnh báo...).
+    - `<x-product-card>`: Hiển thị thông tin món ăn đồng nhất toàn website.
 
-    ENROLLMENTS {
-        bigint id PK
-        bigint course_id FK
-        bigint student_id FK
-        timestamp created_at
-        timestamp updated_at
-    }
-```
+## 3. HƯỚNG DẪN SQL (CƠ SỞ DỮ LIỆU)
+Bạn cần tạo database tên là `coffee_shop_db`. Hệ thống sử dụng 5 bảng chính được khởi tạo qua Migration.
 
----
+**Dữ liệu mẫu (Seeder):**
+Chạy `php artisan db:seed --class=CoffeeShopSeeder` để có ngay danh sách bàn và các loại cà phê mẫu.
 
-## 3. Phác thảo giao diện (UI Sketch)
-
-### A. Layout Master
-- **Sidebar (Trái)**: Logo "EduMaster", Menu điều hướng (Dashboard, Khóa học, Bài học, Đăng ký).
-- **Main Content (Phải)**: Header trang, Thông báo Alert Success/Error và nội dung chính của từng chức năng.
-
-### B. Dashboard
-- **Top Row**: 4 Thẻ Card thống kê (Tổng khóa học, Tổng học viên, Doanh thu, Top Course).
-- **Bottom Table**: Danh sách 5 khóa học mới nhất với ảnh minh họa và Badge trạng thái màu sắc.
-
-### C. Khóa học (Index)
-- **Header**: Nút "Thêm mới" và nút "Thùng rác".
-- **Filter Section**: Thanh tìm kiếm + Các Select box (Trạng thái, Sắp xếp theo, Thứ tự).
-- **Main Table**: Hiển thị ảnh (nếu có), Tên, Giá, Trạng thái (Green/Red Badge), Số lượng bài học.
-
-### D. Form Thêm/Sửa
-- Các Input field được thiết kế tập trung, có `validation` hiển thị lỗi ngay trên đầu trang.
-- Hỗ trợ xem trước ảnh cũ khi cập nhật khóa học.
+## 4. QUY TRÌNH NGHIỆP VỤ (WORKFLOW)
+1. **Quản lý kho**: Admin thêm Category -> Thêm Product vào Category đó.
+2. **Tiếp khách**: Khách vào bàn -> Mở đơn hàng (chọn bàn trống).
+3. **Gọi món**: Chọn món từ danh sách -> Nhập số lượng -> Hệ thống tính tổng tiền.
+4. **Thanh toán**: Bấm hoàn tất -> Đơn hàng chuyển sang 'completed' -> Bàn tự động chuyển về trạng thái 'empty'.

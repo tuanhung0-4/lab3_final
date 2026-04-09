@@ -1,92 +1,111 @@
 @extends('layouts.master')
 
-@section('title', 'Dashboard - Tổng quan hệ thống')
-
 @section('content')
-<div class="page-header">
-    <div class="page-title">
-        <h1>Dashboard</h1>
-        <p>Chào mừng bạn trở lại, đây là tóm tắt hệ thống của bạn.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card" style="margin-bottom: 0; background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color: white;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <p style="opacity: 0.8; font-size: 0.875rem; font-weight: 500;">Doanh thu hôm nay</p>
+                <h3 style="font-size: 1.75rem; margin-top: 0.5rem;">{{ number_format($totalRevenue, 0, ',', '.') }}đ</h3>
+            </div>
+            <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-wallet fa-lg"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card" style="margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <p style="color: #64748b; font-size: 0.875rem; font-weight: 500;">Tổng đơn hàng</p>
+                <h3 style="font-size: 1.75rem; margin-top: 0.5rem; color: #1e293b;">{{ $totalOrders }}</h3>
+            </div>
+            <div style="background: #f1f5f9; color: #6366f1; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-shopping-bag fa-lg"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <p style="color: #64748b; font-size: 0.875rem; font-weight: 500;">Bàn đang có khách</p>
+                <h3 style="font-size: 1.75rem; margin-top: 0.5rem; color: #1e293b;">{{ $occupiedTables }}</h3>
+            </div>
+            <div style="background: #f1f5f9; color: #f59e0b; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-users fa-lg"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <p style="color: #64748b; font-size: 0.875rem; font-weight: 500;">Số lượng món</p>
+                <h3 style="font-size: 1.75rem; margin-top: 0.5rem; color: #1e293b;">{{ $totalProducts }}</h3>
+            </div>
+            <div style="background: #f1f5f9; color: #22c55e; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-utensils fa-lg"></i>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="stat-grid">
-    <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
-            <ion-icon name="book-outline"></ion-icon>
-        </div>
-        <div class="stat-info">
-            <h3>Tổng khóa học</h3>
-            <p>{{ $totalCourses }}</p>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
-            <ion-icon name="people-outline"></ion-icon>
-        </div>
-        <div class="stat-info">
-            <h3>Tổng học viên</h3>
-            <p>{{ $totalStudents }}</p>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
-            <ion-icon name="cash-outline"></ion-icon>
-        </div>
-        <div class="stat-info">
-            <h3>Tổng doanh thu</h3>
-            <p>{{ number_format($totalRevenue, 0, ',', '.') }} đ</p>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">
-            <ion-icon name="star-outline"></ion-icon>
-        </div>
-        <div class="stat-info">
-            <h3>Khóa học hot nhất</h3>
-            <p>{{ $topCourse ? $topCourse->name : 'N/A' }}</p>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h2 style="margin-bottom: 1.5rem;">5 Khóa học mới nhất</h2>
-    <div class="table-container">
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+    <div class="card">
+        <h4 style="font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-star" style="color: #f59e0b;"></i>
+            Bán chạy nhất
+        </h4>
         <table>
             <thead>
                 <tr>
-                    <th>Khóa học</th>
-                    <th>Giá</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày tạo</th>
+                    <th>Món ăn</th>
+                    <th>Đã bán</th>
+                    <th>Doanh thu</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($newestCourses as $course)
+                @foreach($topProducts as $item)
                 <tr>
                     <td>
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            @if($course->image)
-                                <img src="{{ asset('storage/' . $course->image) }}" class="img-preview">
+                            @if($item->product->image)
+                                <img src="{{ asset('storage/' . $item->product->image) }}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
                             @else
-                                <div class="img-preview" style="background: var(--gray-200); display: flex; align-items: center; justify-content: center;">
-                                    <ion-icon name="image-outline"></ion-icon>
+                                <div style="width: 40px; height: 40px; border-radius: 8px; background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-image text-muted"></i>
                                 </div>
                             @endif
-                            <span style="font-weight: 500;">{{ $course->name }}</span>
+                            <span style="font-weight: 500;">{{ $item->product->name }}</span>
                         </div>
                     </td>
-                    <td>{{ number_format($course->price, 0, ',', '.') }} đ</td>
-                    <td><span class="badge badge-{{ $course->status }}">{{ $course->status }}</span></td>
-                    <td>{{ $course->created_at->format('d/m/Y') }}</td>
+                    <td>{{ $item->total_sold }}</td>
+                    <td style="font-weight: 600; color: #6366f1;">{{ number_format($item->total_sold * $item->product->price, 0, ',', '.') }}đ</td>
                 </tr>
-                @empty
-                <tr>
-                    <td colspan="4" style="text-align: center; color: var(--secondary);">Chưa có khóa học nào.</td>
-                </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
+    </div>
+
+    <div class="card">
+        <h4 style="font-weight: 600; margin-bottom: 1.5rem;">Doanh thu theo loại</h4>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            @foreach($revenueByCategory as $category)
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.875rem; font-weight: 500;">{{ $category['name'] }}</span>
+                        <span style="font-size: 0.875rem; color: #64748b;">{{ number_format($category['revenue'], 0, ',', '.') }}đ</span>
+                    </div>
+                    <div style="height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden;">
+                        @php
+                            $percentage = $totalRevenue > 0 ? ($category['revenue'] / $totalRevenue) * 100 : 0;
+                        @endphp
+                        <div style="height: 100%; width: {{ $percentage }}%; background: var(--primary);"></div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
     </div>
 </div>
 @endsection

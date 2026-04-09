@@ -8,14 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('courses', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('slug')->unique();
-            $table->decimal('price', 15, 2);
-            $table->text('description')->nullable();
+            $table->decimal('price', 10, 2);
             $table->string('image')->nullable();
-            $table->enum('status', ['draft', 'published'])->default('draft');
+            $table->enum('status', ['available', 'unavailable'])->default('available');
+            $table->text('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -23,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('courses');
+        Schema::dropIfExists('products');
     }
 };
